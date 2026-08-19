@@ -3,6 +3,8 @@
   "authors": [
     "Elizabeth Mattijsen"
   ],
+  "build-depends": [
+  ],
   "depends": [
   ],
   "description": "Introspect Raku types",
@@ -12,12 +14,22 @@
     "Rakudo-Type-Introspection": "lib/Rakudo-Type-Introspection.rakumod"
   },
   "raku": "6.d",
+  "resources": [
+  ],
+  "source-url": "https://codeberg.org/lizmat/Rakudo-Type-Introspection.git",
   "support": {
     "bugtracker": "https://codeberg.org/lizmat/Rakudo-Type-Introspection/issues",
     "email": "liz@raku.rocks",
     "source": "https://codeberg.org/lizmat/Rakudo-Type-Introspection.git"
   },
-  "tags": [ "RAKUDO", "TYPE", "INTROSPECTION", "TOOL"., "UTIL"
+  "tags": [
+    "RAKUDO",
+    "TYPE",
+    "INTROSPECTION",
+    "TOOL",
+    "UTIL"
+  ],
+  "test-depends": [
   ],
   "version": "0.0.1"
 }
