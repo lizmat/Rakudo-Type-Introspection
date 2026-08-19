@@ -1,0 +1,45 @@
+use Test;
+use Rakudo-Type-Introspection;
+
+plan 34;
+
+isa-ok MY::<&isa>,       Routine, 'was isa() imported';
+isa-ok MY::<&does>,      Routine, 'was does() imported';
+isa-ok MY::<&core>,      Routine, 'was core() imported';
+isa-ok MY::<&namespace>, Routine, 'was namespace() imported';
+isa-ok MY::<&nqp>,       Routine, 'was nqp() imported';
+
+is-deeply isa(Int),       (Cool,), 'does isa() work correctly on Int';
+is-deeply does(Int),      (Real,), 'does does() work correctly on Int';
+is-deeply core(Int),      "v6c",   'does core() work correctly on Int';
+is-deeply namespace(Int), "class", 'does namespace() work correctly on Int';
+is-deeply nqp(Int),        False,  'does nqp() work correctly on Int';
+
+is-deeply isa(42),       (Cool,), 'does isa() work correctly on 42';
+is-deeply does(42),      (Real,), 'does does() work correctly on 42';
+is-deeply core(42),      "v6c",   'does core() work correctly on 42';
+is-deeply namespace(42), "class", 'does namespace() work correctly on 42';
+is-deeply nqp(42),        False,  'does nqp() work correctly on 42';
+
+is-deeply isa(Mu),  (), 'does isa() work correctly on Mu';
+is-deeply does(IO), (), 'does does() work correctly on IO';
+
+my $introspection := Rakudo-Type-Introspection.new;
+isa-ok $introspection, Rakudo-Type-Introspection;
+
+for
+  $introspection<Int>,   "introspected",
+  Rakudo::Type.new(Int), "from-type"
+-> $Int, $source {
+    is-deeply $Int.type, Int,   "$source: is the type correct";
+    is $Int.namespace, "class", "$source: is the namespace correct";
+    is $Int.name, "Int",        "$source: is the name correct";
+    is $Int.core, "v6c",        "$source: is the core level correct";
+    is-deeply $Int.nqp, False,  "$source: not an NQP class";
+    is $Int.isa, "Cool",        "$source: is the isa correct";
+    is $Int.does, "Real",       "$source: is the does correct";
+    is $Int.gist, "class Int (v6c) is Cool does Real",
+      "$source: is the gist correct";
+}
+
+# vim: expandtab shiftwidth=4

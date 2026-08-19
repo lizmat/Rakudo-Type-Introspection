@@ -1,0 +1,23 @@
+{
+  "auth": "zef:lizmat",
+  "authors": [
+    "Elizabeth Mattijsen"
+  ],
+  "depends": [
+  ],
+  "description": "Introspect Raku types",
+  "license": "Artistic-2.0",
+  "name": "Rakudo-Type-Introspection",
+  "provides": {
+    "Rakudo-Type-Introspection": "lib/Rakudo-Type-Introspection.rakumod"
+  },
+  "raku": "6.d",
+  "support": {
+    "bugtracker": "https://codeberg.org/lizmat/Rakudo-Type-Introspection/issues",
+    "email": "liz@raku.rocks",
+    "source": "https://codeberg.org/lizmat/Rakudo-Type-Introspection.git"
+  },
+  "tags": [ "RAKUDO", "TYPE", "INTROSPECTION", "TOOL"., "UTIL"
+  ],
+  "version": "0.0.1"
+}

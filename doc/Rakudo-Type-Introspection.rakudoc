@@ -1,0 +1,227 @@
+=begin pod
+
+=head1 NAME
+
+Rakudo-Type-Introspection - introspect Raku types
+
+=head1 SYNOPSIS
+
+=begin code :lang<raku>
+use Rakudo-Type-Introspection;
+
+my $type = Rakudo::Type.new(Rat);
+say $type.isa;   # Cool
+say $type.does;  # Rational
+
+my $introspection = Rakudo::Type::Introspection.new(CORE::);
+say $introspection<Int>.name;  # Int
+
+say isa(IO::Path);   # Cool
+say does(IO::Path);  # IO
+say core(IO::Path);  # v6c
+=end code
+
+=head1 DESCRIPTION
+
+The C<Rakudo-Type-Introspection> distribution provides the logic to
+introspect Raku types and C<PseudoStash>es.
+
+=head1 CLASSES
+
+=head2 Rakudo::Type
+
+=begin code :lang<raku>
+my $type = Rakudo::Type.new(IntStr);
+say $type.core;       # v6c
+say $type.namespace;  # class
+=end code
+
+The C<Rakudo::Type> object collects information about a type. It
+can instantiated by specifying a single positional argument to the
+C<new> method.
+
+=head3 ATTRIBUTES
+
+The C<Rakudo::Type> class contains the following public attributes,
+which can also be specified as named arguments to the C<new> methdod.
+
+=head4 type
+
+The actual type object that was used to create the C<Rakudo::Type>
+object.
+
+=head4 namespace
+
+The type of namespace (scope) of the type.  One of the following:
+
+=item class
+=item enum
+=item grammar
+=item module
+=item native
+=item nativeref
+=item package
+=item role
+=item subset
+
+=head4 name
+
+The name of the type, as introspected with C<.^name>.
+
+=head4 core
+
+The core level in which the type was defined, as a string.  One of the
+following:
+
+=item "v6c"
+=item "v6d"
+=item "v6e"
+=item "" - not a core type
+
+=head4 nqp
+
+Boolean, indicating whether the type was created in NQP.
+
+=head4 isa
+
+A C<List> of C<Rakudo::Type> objects of unique parent classes.
+
+=head4 does
+
+A C<List> of C<Rakudo::Type> objects of unique roles (also excluding
+any roles that have already been consumed by any parent class).
+
+=head3 METHODS
+
+=head4 gist
+
+=begin code :lang<raku>
+say Rakudo::Type.new(IntStr); # class IntStr (v6c) is Allomorph is Int
+=end code
+
+The C<gist> method provides a simple representation of the type, almost
+as if written in Raku.
+
+=head2 Rakudo-Type-Introspection
+
+=begin code :lang<raku>
+my $introspection = Rakudo::Type::Introspection.new(CORE::);
+say $introspection<IO::Path>.does;  # IO
+=end code
+
+The C<Rakudo-Type-Introspection> class incorporates the logic to
+recursively collect the type information of a given C<PseudoStash>
+(with the C<CORE::> C<PseudoStash> taken as the default).
+
+It exposes the information as a C<Map> keyed on the full name of
+all the types found in the given C<PseudoStash>, with the value
+being the associated C<Rakudo::Type> object.
+
+=head3 method new
+
+The C<new> method additionally takes the following named arguments:
+
+=head4 :implementation-detail
+
+Will include types that have been marked as C<is implementation-detail>
+if specified with a trueish value.  Default is to B<not> include
+types that are implementation details.
+
+=head4 :nqp
+
+Will include types that originated from NQP code if specified with a
+trueish value.  Default is to B<not> include types from NQP.
+
+=head4 :package
+
+Will include C<package> types if specified with a trueish value.
+Default is to B<not> include C<package>s.
+
+=head4 :rakuast
+
+Will include C<RakuAST::...> classes if specified with a trueish
+value.  Default is to B<not> include C<RakuAST::...> classes.
+
+=head1 EXPORTED SUBROUTINES
+
+Some basic functionality is exported as subroutines.
+
+=head2 isa
+
+=begin code :lang<raku>
+say isa(Int);  # Cool
+dd Int.^mro;   # (Int, Cool, Any, Mu)
+=end code
+
+The C<isa> subroutine takes a type object and returns a list of
+types of unique parent classes.  This is different from what the
+C<.^mro> method returns.  Because C<Cool> is an C<Any>, and C<Any>
+is a C<Mu>, the specification of C<is Cool> is enough in a
+C<class Foo is Cool> statement.
+
+=head2 does
+
+=begin code :lang<raku>
+say does(Int);  # Real
+dd Int.^roles;  # (Real, Numeric)
+=end code
+
+The C<does> subroutine takes a type object and returns a list of
+unique roles that are consumed by the class.  This is different from
+what the C<.^roles> method returns.  Because the C<Real> role consumed
+the C<Numeric> role, the specification of C<does Real> is enough in a
+C<class Bar does Real> statement.
+
+=head2 core
+
+=begin code :lang<raku>
+use v6.e.PREVIEW;
+dd core(Int);            # "v6c"
+dd core(Formatter);      # "v6e"
+dd core(class Foo { });  # ""
+=end code
+
+The C<core> subroutine takes a type object and returns a string
+indicating in which core level the type was defined, or it returns
+the empty string if the type could not be found in core.
+
+=head2 namespace
+
+=begin code :lang<raku>
+dd namespace(IO);   # "role"
+dd namespace(Int);  # "class"
+=end code
+
+The C<namespace> subroutine takes a type object and returns a string
+indicating the type of namespace (scope) of the type.
+
+=head2 nqp
+
+=begin code :lang<raku>
+dd nqp(IO);                   # False
+dd nqp(Metamodel::ClassHOW);  # True
+=end code
+
+The C<nqp> subroutine takes a type object and returns a C<Bool>
+indicating whether or not the type originated from NQP.
+
+=head1 AUTHOR
+
+Elizabeth Mattijsen <liz@raku.rocks>
+
+Source can be located at: https://codeberg.org/lizmat/Rakudo-Type-Introspection .
+Comments and Pull Requests are welcome.
+
+If you like this module, or what I'm doing more generally, committing to a
+L<small sponsorship|https://github.com/sponsors/lizmat/>  would mean a great
+deal to me!
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 Elizabeth Mattijsen
+
+This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+
+=end pod
+
+# vim: expandtab shiftwidth=4
