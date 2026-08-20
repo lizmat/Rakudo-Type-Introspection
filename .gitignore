@@ -1,3 +1,4 @@
 .precomp/
 /Rakudo-Type-Introspection-*
+/releases/
 *.rakucov

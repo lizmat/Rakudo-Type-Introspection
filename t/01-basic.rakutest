@@ -38,7 +38,7 @@ for
     is-deeply $Int.nqp, False,  "$source: not an NQP class";
     is $Int.isa, "Cool",        "$source: is the isa correct";
     is $Int.does, "Real",       "$source: is the does correct";
-    is $Int.gist, "class Int (v6c) is Cool does Real",
+    is $Int.gist, "class Int is Cool does Real",
       "$source: is the gist correct";
 }
 

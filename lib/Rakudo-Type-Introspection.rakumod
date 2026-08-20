@@ -206,10 +206,17 @@ class Rakudo::Type {
     multi method Str(Rakudo::Type:D:) { $!name }
 
     multi method gist(Rakudo::Type:D:) {
-        my str @parts = $!namespace, $!name, ("($!core)" if $!core);
+        my str @parts =
+          $!namespace,
+          $!core && $!core ne 'v6c' ?? $!core ~ "::$!name" !! $!name
+        ;
         @parts.append: @!isa.map:  { "is $_.name()"   }
         @parts.append: @!does.map: { "does $_.name()" }
         @parts.join(" ");
+    }
+
+    method core-name(Rakudo::Type:D:) {
+        $!core ?? "CORE::$!core" ~ "::$!name" !! $!name
     }
 }
 
@@ -253,6 +260,11 @@ BEGIN {
       Rakudo::Type.bless(
         :type(Nil), :namespace<class>, :name<Nil>, :core<v6c>, :isa(CoolRT,)
       );
+    %types{nqp::objectid(Exception)} :=  # UNCOVERABLE
+      Rakudo::Type.bless(
+        :type(Exception), :namespace<class>, :name<Exception>, :core<v6c>,
+        :isa(AnyRT,)
+      );
     %types{nqp::objectid(Failure)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
         :type(Failure), :namespace<class>, :name<Failure>, :core<v6c>,
@@ -262,16 +274,13 @@ BEGIN {
 
 #- Rakudo-Type-Introspection ---------------------------------------------------
 class Rakudo-Type-Introspection {
-    has %!types is built is Map handles <AT-KEY keys pairs kv values iterator>;
+    has %!types is built is Map;
 
     proto method new(|) {*}
 
     multi method new(Rakudo-Type-Introspection:U:
-      PseudoStash:D $stash = CORE::,
-                   :$implementation-detail,
-                   :$nqp,
-                   :$package,
-                   :$rakuast
+      CORE::v6c::PseudoStash:D $stash = CORE::,  # both 6c/e PseudoStash
+      :$implementation-detail, :$nqp, :$package, :$rakuast
     ) {
         my %types = $stash.pairs.sort(*.key.fc).map: -> $pair {
             my $name := $pair.key;
@@ -308,10 +317,50 @@ class Rakudo-Type-Introspection {
                 }
                 process($type);
 
-                @rts.map({ .name => $_ }).Slip
+                @rts.map({ .core-name => $_ }).Slip
             }
         }
+
+        # Make sure all dependent types are also findable
+        for %types.values -> $type {
+            for $type.isa -> $isa {
+                my $name := $isa.core-name;
+                %types{$name} //= $isa;
+            }
+            for $type.does -> $does {
+                my $name := $does.core-name;
+                %types{$name} //= $does;
+            }
+        }
+
         self.bless(:%types)
+    }
+
+    method AT-KEY(Rakudo-Type-Introspection:D: str $key) {
+        my %types := %!types;
+        %types.AT-KEY($key)
+          // %types.AT-KEY("CORE::v6c::$key")
+          // %types.AT-KEY("CORE::v6d::$key")
+          // %types.AT-KEY("CORE::v6e::$key")
+    }
+
+    my sub normalize-key($key) { $key.subst(/^ 'CORE::v6' <[cde]> '::'/ ).fc }
+
+    method iterator(Rakudo-Type-Introspection:D:) {
+        self.pairs.iterator
+    }
+
+    method pairs(Rakudo-Type-Introspection:D:) {
+        %!types.sort({ normalize-key(.key) })
+    }
+    method keys(Rakudo-Type-Introspection:D:) {
+        %!types.keys.sort(&normalize-key)
+    }
+    method values(Rakudo-Type-Introspection:D:) {
+        %!types.sort({ normalize-key(.key) }).map(*.value)
+    }
+    method kv(Rakudo-Type-Introspection:D:) {
+        %!types.sort({ normalize-key(.key) }).map: { (.key, .value).Slip }
     }
 }
 

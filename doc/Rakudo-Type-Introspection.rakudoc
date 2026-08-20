@@ -96,7 +96,7 @@ any roles that have already been consumed by any parent class).
 =head4 gist
 
 =begin code :lang<raku>
-say Rakudo::Type.new(IntStr); # class IntStr (v6c) is Allomorph is Int
+say Rakudo::Type.new(IntStr); # class IntStr is Allomorph is Int
 =end code
 
 The C<gist> method provides a simple representation of the type, almost

@@ -1,0 +1,20 @@
+use Test;
+use Rakudo-Type-Introspection;
+
+plan 5;
+
+my $introspection = Rakudo-Type-Introspection.new(MY::);
+
+is $introspection<Mu>.gist,   'class Mu',          'is Mu found';
+is $introspection<Any>.gist,  'class Any is Mu',   'is Any found';
+is $introspection<Cool>.gist, 'class Cool is Any', 'is Cool found';
+is $introspection<Nil>.gist,  'class Nil is Cool', 'is Nil found';
+is $introspection<Test>.gist, 'module Test',       'is Test found';
+
+# for coverage testing
+$introspection.iterator.push-all(my @a);
+my @b = $introspection.keys;
+my @c = $introspection.values;
+my @d = $introspection.kv;
+
+# vim: expandtab shiftwidth=4

@@ -1,6 +1,11 @@
 Revision history for Rakudo-Type-Introspection
 
 {{$NEXT}}
+    - Fix specification of PseudoStash from v6.c compunit
+    - More tests
+    - Refinement of .gist
+    - Make Introspection always return keys/values in sorted
+      order
 
 0.0.1  2026-08-19T22:22:00+02:00
     - Initial version

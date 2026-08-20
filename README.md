@@ -105,7 +105,7 @@ A `List` of `Rakudo::Type` objects of unique roles (also excluding any roles tha
 #### gist
 
 ```raku
-say Rakudo::Type.new(IntStr); # class IntStr (v6c) is Allomorph is Int
+say Rakudo::Type.new(IntStr); # class IntStr is Allomorph is Int
 ```
 
 The `gist` method provides a simple representation of the type, almost as if written in Raku.
