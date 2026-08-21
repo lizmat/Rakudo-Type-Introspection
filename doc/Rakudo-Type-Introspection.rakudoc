@@ -10,15 +10,15 @@ Rakudo-Type-Introspection - introspect Raku types
 use Rakudo-Type-Introspection;
 
 my $type = Rakudo::Type.new(Rat);
-say $type.isa;   # Cool
-say $type.does;  # Rational
+say $type.parents; # Cool
+say $type.does;    # Rational
 
 my $introspection = Rakudo::Type::Introspection.new(CORE::);
 say $introspection<Int>.name;  # Int
 
-say isa(IO::Path);   # Cool
-say does(IO::Path);  # IO
-say core(IO::Path);  # v6c
+say parents(IO::Path); # Cool
+say does(IO::Path);    # IO
+say core(IO::Path);    # v6c
 =end code
 
 =head1 DESCRIPTION
@@ -82,7 +82,7 @@ following:
 
 Boolean, indicating whether the type was created in NQP.
 
-=head4 isa
+=head4 parents
 
 A C<List> of C<Rakudo::Type> objects of unique parent classes.
 
@@ -146,14 +146,14 @@ value.  Default is to B<not> include C<RakuAST::...> classes.
 
 Some basic functionality is exported as subroutines.
 
-=head2 isa
+=head2 parents
 
 =begin code :lang<raku>
-say isa(Int);  # Cool
-dd Int.^mro;   # (Int, Cool, Any, Mu)
+say parents(Int); # Cool
+dd Int.^mro;      # (Int, Cool, Any, Mu)
 =end code
 
-The C<isa> subroutine takes a type object and returns a list of
+The C<parents> subroutine takes a type object and returns a list of
 types of unique parent classes.  This is different from what the
 C<.^mro> method returns.  Because C<Cool> is an C<Any>, and C<Any>
 is a C<Mu>, the specification of C<is Cool> is enough in a

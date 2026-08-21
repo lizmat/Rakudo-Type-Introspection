@@ -1,7 +1,7 @@
 use Test;
 use Rakudo-Type-Introspection;
 
-plan 5;
+plan 9;
 
 my $introspection = Rakudo-Type-Introspection.new(MY::);
 
@@ -13,8 +13,9 @@ is $introspection<Test>.gist, 'module Test',       'is Test found';
 
 # for coverage testing
 $introspection.iterator.push-all(my @a);
-my @b = $introspection.keys;
-my @c = $introspection.values;
-my @d = $introspection.kv;
+is-deeply $introspection.pairs,  @a.Seq,               'does pairs work ok';
+is-deeply $introspection.keys,   @a.map(*.key),        'does keys work ok';
+is-deeply $introspection.values, @a.map(*.value),      'does values work ok';
+is-deeply $introspection.kv, @a.map({|(.key,.value)}), 'does kv work ok';
 
 # vim: expandtab shiftwidth=4

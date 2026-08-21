@@ -12,15 +12,15 @@ SYNOPSIS
 use Rakudo-Type-Introspection;
 
 my $type = Rakudo::Type.new(Rat);
-say $type.isa;   # Cool
-say $type.does;  # Rational
+say $type.parents; # Cool
+say $type.does;    # Rational
 
 my $introspection = Rakudo::Type::Introspection.new(CORE::);
 say $introspection<Int>.name;  # Int
 
-say isa(IO::Path);   # Cool
-say does(IO::Path);  # IO
-say core(IO::Path);  # v6c
+say parents(IO::Path); # Cool
+say does(IO::Path);    # IO
+say core(IO::Path);    # v6c
 ```
 
 DESCRIPTION
@@ -92,7 +92,7 @@ The core level in which the type was defined, as a string. One of the following:
 
 Boolean, indicating whether the type was created in NQP.
 
-#### isa
+#### parents
 
 A `List` of `Rakudo::Type` objects of unique parent classes.
 
@@ -147,15 +147,15 @@ EXPORTED SUBROUTINES
 
 Some basic functionality is exported as subroutines.
 
-isa
----
+parents
+-------
 
 ```raku
-say isa(Int);  # Cool
-dd Int.^mro;   # (Int, Cool, Any, Mu)
+say parents(Int); # Cool
+dd Int.^mro;      # (Int, Cool, Any, Mu)
 ```
 
-The `isa` subroutine takes a type object and returns a list of types of unique parent classes. This is different from what the `.^mro` method returns. Because `Cool` is an `Any`, and `Any` is a `Mu`, the specification of `is Cool` is enough in a `class Foo is Cool` statement.
+The `parents` subroutine takes a type object and returns a list of types of unique parent classes. This is different from what the `.^mro` method returns. Because `Cool` is an `Any`, and `Any` is a `Mu`, the specification of `is Cool` is enough in a `class Foo is Cool` statement.
 
 does
 ----

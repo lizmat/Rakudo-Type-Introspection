@@ -1,6 +1,8 @@
 Revision history for Rakudo-Type-Introspection
 
 {{$NEXT}}
+    - Rename "isa" sub/method to "parents", to prevent strange
+      interaction with .isa method on older Rakudos
 
 0.0.2  2026-08-20T21:33:01+02:00
     - Fix specification of PseudoStash from v6.c compunit

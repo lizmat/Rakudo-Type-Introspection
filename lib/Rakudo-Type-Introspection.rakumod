@@ -27,30 +27,30 @@ sub basenameHOW(Mu $type) { $type.HOW.^name.split('HOW',2).head ~ 'HOW' }
 #- exported subs ---------------------------------------------------------------
 
 # Produce list of "is" classes of a type
-proto sub isa(|) is export {*}
-multi sub isa(Mu:D $value) { isa($value.WHAT) }
-multi sub isa(Mu:U $type) {
+proto sub parents(|) is export {*}
+multi sub parents(Mu:D $value) { parents($value.WHAT) }
+multi sub parents(Mu:U $type) {
 
     # Need special casing to handle Nil properly
-    my @isa is default(Nil) = nqp::can($type.HOW,"mro")
+    my @parents is default(Nil) = nqp::can($type.HOW,"mro")
       ?? $type.^mro.skip
       !! Empty;
 
     # Not Mu
-    if @isa {
-        my int $i = @isa.elems;
+    if @parents {
+        my int $i = @parents.elems;
         while --$i {
-            my $that := @isa[$i];
-            for @isa[^$i] -> $this {
+            my $that := @parents[$i];
+            for @parents[^$i] -> $this {
 
                 # Already a parent class in list
                 if nqp::istype($this,$that) {
-                    @isa.splice($i,1);
+                    @parents.splice($i,1);
                     last;
                 }
             }
         }
-        @isa.List
+        @parents.List
     }
 
     # Presumably Mu
@@ -83,12 +83,12 @@ multi sub does(Mu:U $type) {
         }
 
         $i = @does.elems;
-        my @isa := isa($type);
+        my @parents := parents($type);
         while --$i >= 0 {
             my $that := @does[$i];
 
             # A parent class already does the role
-            for @isa -> $this {
+            for @parents -> $this {
                 if nqp::istype($this,$that) {
                     @does.splice($i,1);
                     last;
@@ -158,7 +158,7 @@ class Rakudo::Type {
     has str          $.name;
     has str          $.core;
     has Bool         $.nqp;
-    has Rakudo::Type @.isa  is built(:bind);
+    has Rakudo::Type @.parents  is built(:bind);
     has Rakudo::Type @.does is built(:bind);
 
     multi method new(Rakudo::Type:U: Mu $object) {
@@ -184,11 +184,11 @@ class Rakudo::Type {
                 my str $core = core($type);
                 my     $nqp := nqp($type);
 
-                my @isa  = isa($type).map:  { Rakudo::Type.new($_) }
+                my @parents  = parents($type).map:  { Rakudo::Type.new($_) }
                 my @does = does($type).map: { Rakudo::Type.new($_) }
 
                 %types{$name} := self.bless(
-                  :$type, :$namespace, :$core, :$nqp, :$name, :@isa, :@does
+                  :$type, :$namespace, :$core, :$nqp, :$name, :@parents, :@does
                 )
             }
 
@@ -210,7 +210,7 @@ class Rakudo::Type {
           $!namespace,
           $!core && $!core ne 'v6c' ?? $!core ~ "::$!name" !! $!name
         ;
-        @parts.append: @!isa.map:  { "is $_.name()"   }
+        @parts.append: @!parents.map:  { "is $_.name()"   }
         @parts.append: @!does.map: { "does $_.name()" }
         @parts.join(" ");
     }
@@ -235,7 +235,7 @@ BEGIN {
     %types{nqp::objectid(ContainerDescriptor)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
         :type(ContainerDescriptor), :namespace<class>,
-        :name<ContainerDescriptor>, :nqp, :isa(NQPMuRT,)
+        :name<ContainerDescriptor>, :nqp, :parents(NQPMuRT,)
       );
     %types{nqp::objectid(NQPMatchRole)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
@@ -250,25 +250,25 @@ BEGIN {
       );
     my \AnyRT = %types{nqp::objectid(Any)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
-        :type(Any), :namespace<class>, :name<Any>, :core<v6c>, :isa(MuRT,)
+        :type(Any), :namespace<class>, :name<Any>, :core<v6c>, :parents(MuRT,)
       );
     my \CoolRT = %types{nqp::objectid(Cool)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
-        :type(Cool), :namespace<class>, :name<Cool>, :core<v6c>, :isa(AnyRT,)
+        :type(Cool), :namespace<class>, :name<Cool>, :core<v6c>, :parents(AnyRT,)
       );
     my \NilRT = %types{nqp::objectid(Nil)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
-        :type(Nil), :namespace<class>, :name<Nil>, :core<v6c>, :isa(CoolRT,)
+        :type(Nil), :namespace<class>, :name<Nil>, :core<v6c>, :parents(CoolRT,)
       );
     %types{nqp::objectid(Exception)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
         :type(Exception), :namespace<class>, :name<Exception>, :core<v6c>,
-        :isa(AnyRT,)
+        :parents(AnyRT,)
       );
     %types{nqp::objectid(Failure)} :=  # UNCOVERABLE
       Rakudo::Type.bless(
         :type(Failure), :namespace<class>, :name<Failure>, :core<v6c>,
-        :isa(NilRT,)
+        :parents(NilRT,)
       );
 }
 
@@ -323,9 +323,9 @@ class Rakudo-Type-Introspection {
 
         # Make sure all dependent types are also findable
         for %types.values -> $type {
-            for $type.isa -> $isa {
-                my $name := $isa.core-name;
-                %types{$name} //= $isa;
+            for $type.parents -> $parents {
+                my $name := $parents.core-name;
+                %types{$name} //= $parents;
             }
             for $type.does -> $does {
                 my $name := $does.core-name;
