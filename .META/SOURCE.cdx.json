@@ -4,7 +4,7 @@
   "specVersion": "1.6",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-08-20T19:33:35+00:00",
+    "timestamp": "2026-08-21T08:05:06+00:00",
     "lifecycles": [
       {
         "phase": "pre-build"
@@ -19,7 +19,7 @@
     "component": {
       "type": "library",
       "mime-type": "text/plain",
-      "bom-ref": "pkg:raku/zef:lizmat/Rakudo-Type-Introspection@0.0.2",
+      "bom-ref": "pkg:raku/zef:lizmat/Rakudo-Type-Introspection@0.0.3",
       "authors": [
         {
           "bom-ref": "ElizabethMattijsen",
@@ -29,7 +29,7 @@
       "publisher": "zef",
       "group": "zef:lizmat",
       "name": "Rakudo-Type-Introspection",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "description": "Introspect Raku types",
       "scope": "required",
       "licenses": [
@@ -41,14 +41,14 @@
           }
         }
       ],
-      "purl": "pkg:raku/zef:lizmat/Rakudo-Type-Introspection@0.0.2",
+      "purl": "pkg:raku/zef:lizmat/Rakudo-Type-Introspection@0.0.3",
       "externalReferences": [
         {
           "url": "https://codeberg.org/lizmat/Rakudo-Type-Introspection",
           "type": "distribution"
         },
         {
-          "url": "https://raku.land/zef:lizmat/Rakudo-Type-Introspection?v=0.0.2",
+          "url": "https://raku.land/zef:lizmat/Rakudo-Type-Introspection?v=0.0.3",
           "type": "documentation"
         },
         {
@@ -240,7 +240,7 @@
       "type": "distribution"
     },
     {
-      "url": "https://raku.land/zef:lizmat/Rakudo-Type-Introspection?v=0.0.2",
+      "url": "https://raku.land/zef:lizmat/Rakudo-Type-Introspection?v=0.0.3",
       "type": "documentation"
     },
     {

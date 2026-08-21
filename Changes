@@ -1,6 +1,8 @@
 Revision history for Rakudo-Type-Introspection
 
 {{$NEXT}}
+
+0.0.3  2026-08-21T10:04:31+02:00
     - Rename "isa" sub/method to "parents", to prevent strange
       interaction with .isa method on older Rakudos
 
